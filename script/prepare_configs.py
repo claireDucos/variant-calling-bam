@@ -195,9 +195,9 @@ def search_bam(directory)-> Generator[Dict[str, Path], None, None]:
             bam = current_file
             bai = f"{str(current_file)}.bai"
             yield {
-                "name": bam.stem
-                "bam": bam,
-                "bai": (bai if bai.exists() is True else None)
+                "Sample_id": bam.stem,
+                "Bam": bam,
+                "Bai": (bai if bai.exists() is True else None)
             }
 
 
@@ -229,10 +229,8 @@ def build_design(*bams: List[Dict[str, Union[Path, str, None]]],
             index_col=0
         )
 
-    design_frame = pandas.DataFrame({
-        bam_dict["name"] : bam_dict
-        for bam_dict in bams
-    })
+    design_frame = pandas.DataFrame(bams)
+    design_frame.set_index("Sample_id")
 
     try:
         design_frame = pandas.merge(
@@ -278,7 +276,7 @@ def args_to_dict(args: argparse.ArgumentParser) -> Dict[str, Any]:
             "varscan_pileup2snp_extra": args.varscan_pileup2snp_extra,
             "varscan_pileup2indel_extra": args.varscan_pileup2indel_extra,
             "gatk_mutect2_extra": args.gatk_mutect2_extra,
-            
+
         }
     }
 
