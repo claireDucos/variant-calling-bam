@@ -12,7 +12,9 @@ from os.path import basename
 from typing import Dict, List
 
 
-def bam_link(sample_id: List[str], bam: List[str], bai: Optional[List[str]]) \
+def bam_link(sample_id: List[str],
+             list_bam: List[str],
+             list_bai: Optional[List[str]] = None) \
              -> Dict[str, str]:
     """
     Return a dictionary with:
@@ -20,11 +22,12 @@ def bam_link(sample_id: List[str], bam: List[str], bai: Optional[List[str]]) \
     """
     bam_dict = {
         f"{sample}.bam": bam
-        for sample, bam in zip(sample_id, bam)
+        for sample, bam in zip(sample_id, list_bam)
         if bam is not None
     }
 
-    for sample, bai in zip(sample_id, bai):
+    ig
+    for sample, bai in zip(sample_id, list_bai):
         if bai is not None and f"{sample}.bam" in bam_dict.key():
             bam_dict[f"{sample}.bam.bai"] = bai
 

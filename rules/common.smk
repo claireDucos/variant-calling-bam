@@ -70,4 +70,15 @@ def get_vcb_targets(get_strelka: bool = False,
 
 
 refs_pack_dict = refs_pack(config["fasta"])
-bam_link_dict = bam_link(design.Sample_id.tolist(), design.Bam.tolist())
+
+try:
+    bam_link_dict = bam_link(
+        design.Sample_id.tolist(),
+        design.Bam.tolist(),
+        design.Bai.tolist()
+    )
+except AttributeError:
+    bam_link_dict = bam_link(
+        design.Sample_id.tolist(),
+        design.Bam.tolist()
+    )
