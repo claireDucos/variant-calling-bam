@@ -101,23 +101,64 @@ def parser() -> argparse.ArgumentParser:
     )
 
     main_parser.add_argument(
-        "--picard-create-sequence-dictionary-extra"
-        help="Extra parameters for Picard CreateSequenceDictionary "
-             "(default: %(default)s)",
+        "--deepvariant-extra",
+        help="Extra parameters for deepvariant make examples",
         default="",
         type=str
     )
 
     main_parser.add_argument(
-        "--samtools-mpileup-extra"
+        "--delly_extra",
+        help="Extra parameters for delly",
+        default="",
+        type=str
+    )
+
+    main_parser.add_argument(
+        "--freebayes-extra",
+        help="Extra parameters for FreeBayes",
+        default="",
+        type=str
+    )
+
+    main_parser.add_argument(
+        "--gatk-mutect2-extra",
+        help="Extra parameters for GATK Mutect2",
+        default="",
+        type=str
+    )
+
+    main_parser.add_argument(
+        "--gatk-haplotypecaller-extra",
+        help="Extra parameters for GATK Haplotype Caller",
+        default="",
+        type=str
+    )
+
+    main_parser.add_argument(
+        "--lofreq-extra",
+        help="Extra parameters for lofreq",
+        default="--verbose",
+        type=str
+    )
+
+    main_parser.add_argument(
+        "--samtools-mpileup-extra",
         help="Extra parameters for samtools mpileup (default: %(default)s)",
         default="",
         type=str
     )
 
     main_parser.add_argument(
-        "--gatk-mutect2-extra"
-        help="Extra parameters for GATK Mutect2 (default: %(default)s)",
+        "--pindel-call-extra",
+        help="Extra parameters for pindel call",
+        default="",
+        type=str
+    )
+
+    main_parser.add_argument(
+        "--pindel-vcf-extra",
+        help="Extra parameters for pindel vcf formatting",
         default="",
         type=str
     )
@@ -134,6 +175,56 @@ def parser() -> argparse.ArgumentParser:
         help="Extra parameters for strelka run (default: %(default)s)",
         default="",
         type=str
+    )
+
+    # Choices in pipeline
+    main_parser.add_argument(
+        "--run-deepvariant",
+        help="Whether to run deepvariant or not",
+        default=False,
+        action='store_true'
+    )
+
+    main_parser.add_argument(
+        "--run-delly",
+        help="Whether to run delly or not",
+        default=False,
+        action='store_true'
+    )
+
+    main_parser.add_argument(
+        "--run-freebayes",
+        help="Whether to run freebayes or not",
+        default=False,
+        action='store_true'
+    )
+
+    main_parser.add_argument(
+        "--run-mutect2",
+        help="Whether to run GATK Mutect2 or not",
+        default=False,
+        action='store_true'
+    )
+
+    main_parser.add_argument(
+        "--run-haplotypecaller",
+        help="Whether to run GATK haplotypecaller or not",
+        default=False,
+        action='store_true'
+    )
+
+    main_parser.add_argument(
+        "--run-lofreq",
+        help="Whether to run LoFreq or not",
+        default=False,
+        action='store_true'
+    )
+
+    main_parser.add_argument(
+        "--run-pindel",
+        help="Whether to run Pindel or not",
+        default=False,
+        action='store_true'
     )
 
     # Logging options
@@ -269,9 +360,29 @@ def args_to_dict(args: argparse.ArgumentParser) -> Dict[str, Any]:
         "singularity_docker_image": args.singularity,
         "cold_storage": args.cold_storage,
         "bam_dir": args.bam_dir,
+        "pipeline": {
+            "run_deepvariant": args.run_deepvariant,
+            "run_delly": args.run_delly,
+            "run_freebayes": args.run_freebayes,
+            "run_mutect2": args.run_mutect2,
+            "run_haplotypecaller": args.run_haplotypecaller,
+            "run_lofreq": args.run_lofreq,
+            "run_pindel": args.run_pindel
+        },
+        "reference": {
+            "release_date": args.reference_release_date,
+            "reference_version": args.reference_version
+        },
         "params": {
             "copy_extra": args.copy_extra,
-            "picard_create_sequence_dictionary_extra": args.picard_create_sequence_dictionary_extra,
+            "deepvariant_extra": args.deepvariant_extra,
+            "delly_extra": args.delly_extra,
+            "freebayes_extra": args.freebayes_extra,
+            "gatk_mutect2_extra": args.gatk_mutect2_extra,
+            "gatk_haplotypecaller_extra": args.gatk_haplotypecaller_extra,
+            "lofreq_extra": args.lofreq_extra,
+            "pindel_call_extra": args.pindel_call_extra,
+            "pindel_vcf_extra": args.pindel_vcf_extra,
             "samtools_mpileup_extra": args.samtools_mpileup_extra,
             "varscan_pileup2snp_extra": args.varscan_pileup2snp_extra,
             "varscan_pileup2indel_extra": args.varscan_pileup2indel_extra,

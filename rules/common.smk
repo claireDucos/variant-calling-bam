@@ -41,31 +41,123 @@ design = pd.read_csv(
 design.set_index(design["Sample_id"])
 validate(design, schema="../schemas/design.schema.yaml")
 
+pindel_types = ["D", "BP", "INV", "TD", "LI", "SI", "RP"]
 
-def get_vcb_targets(get_strelka: bool = False,
-                    get_mutect2: bool = False) -> Dict[str, str]:
+wildcard_constrains:
+    sample = "|".join(design.Sample_id)
+
+
+def get_vcb_targets(get_deepvariant: bool = False,
+                    get_delly: bool = False,
+                    get_freebayes: bool = False,
+                    get_mutect2: bool = False,
+                    get_haplotypecaller: bool = False,
+                    get_lofreq: bool = False,
+                    get_pindel: bool = False,
+                    get_strelka: bool = False,
+                    get_varscan: bool = False,) -> Dict[str, Any]:
     """
     Return the list of requested output file
     """
     targets = {}
-    if get_strelka is True:
+    pipeline = config["pipeline"]
+    callers = sum(1 if caller else 0 for caller in pipeline.values())
+
+    if callers == 0:
+        raise ValueError("At least one caller has to be used")
+
+    merge_required = callers > 1
+
+    if all(get_deepvariant, pipeline.get("run_deepvariant", True)):
+        targets["deepvariant_call"] = expand(
+            "deepvariant/{sample}.vcf.gz",
+            sample=design.Sample_id
+        )
+        targets["deepvariant_idx"] = expand(
+            "deepvariant/{sample}.vcf.gz.tbi",
+            sample=design.Sample_id
+        )
+
+    if all(get_delly, pipeline.get("run_delly", True)):
+        targets["delly_call"] = expand(
+            "delly/call/{sample}.vcf.gz",
+            sample=design.Sample_id
+        )
+        targets["delly_idx"] = expand(
+            "delly/call/{sample}.vcf.gz.tbi",
+            sample=design.Sample_id
+        )
+
+    if all(get_freebayes, pipeline.get("run_freebayes", True)):
+        targets["freebayes_call"] = expand(
+            "freebayes/call/{sample}.vcf.gz",
+            sample=design.Sample_id
+        )
+        targets["freebayes_idx"] = expand(
+            "freebayes/call/{sample}.vcf.gz.tbi",
+            sample=design.Sample_id
+        )
+
+    if all(get_mutect2, pipeline.get("run_mutect2", True)):
+        targets["gatk_mutect2_call"] = expand(
+            "gatk/mutect2/{sample}.vcf.gz",
+            sample=design.Sample_id
+        )
+        targets["gatk_mutect2_idx"] = expand(
+            "gatk/mutect2/{sample}.vcf.gz.tbi",
+            sample=design.Sample_id
+        )
+
+    if all(get_haplotypecaller, pipeline.get("run_haplotypecaller", True)):
+        targets["gatk_haplotypecaller_call"] = expand(
+            "gatk/haplotypecaller/{sample}.g.vcf.gz",
+            sample=design.Sample_id
+        )
+        targets["gatk_haplotypecaller_idx"] = expand(
+            "gatk/haplotypecaller/{sample}.g.vcf.gz.tbi",
+            sample=design.Sample_id
+        )
+
+    if all(get_lofreq, pipeline.get("run_lofreq", True)):
+        targets["lofreq_call"] = expand(
+            "lofreq/{sample}.vcf.gz",
+            sample=design.Sample_id
+        )
+        targets["lofreq_idx"] = expand(
+            "lofreq/{sample}.vcf.gz.tbi",
+            sample=design.Sample_id
+        )
+
+
+    if all(get_pindel, pipeline.get("run_pindel", True)):
+        targets["pindel_call"] = expand(
+            "pindel/vcf/{sample}.vcf.gz",
+            sample=design.Sample_id
+        )
+        targets["pindel_idx"] = expand(
+            "pindel/vcf/{sample}.vcf.gz.tbi",
+            sample=design.Sample_id
+        )
+
+    if all(get_varscan, pipeline.get("run_varscan", True)):
+        targets["varscan_call"] = expand(
+            "varscan/{subcommand}/{sample}.vcf.gz",
+            subcommand=["snp", "indel"],
+            sample=design.Sample_id
+        )
+        targets["varscan_idx"] = expand(
+            "varscan/{subcommand}/{sample}.vcf.gz.tbi",
+            subcommand=["snp", "indel"],
+            sample=design.Sample_id
+        )
+
+
+    if all(get_strelka, pipeline.get("run_strelka", True)):
         targets["strelka"] = expand(
             "strelka/{sample}",
             sample=design.Sample_id
         )
 
-    if get_mutect2 is True:
-        targets["mutect2"] = expand(
-            "gatk/mutect2/{sample}.vcf",
-            sample=design.Sample_id
-        )
-
-    if get_varscan is True:
-        targets["varscan"] = expand(
-            "varscan/{call}/{sample}.vcf.gz",
-            call=["snp", "indel"],
-            sample=design.Sample_id
-        )
     return targets
 
 

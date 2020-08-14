@@ -20,8 +20,6 @@ rule strelka_germline:
         )
     log:
         "logs/strelka/{sample}.log"
-    wildcard_constraints:
-        sample = "|".join(design.Sample_id)
     threads:
         max(2, config["threads"])
     params:
